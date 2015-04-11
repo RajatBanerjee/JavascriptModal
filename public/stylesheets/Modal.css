@@ -1,11 +1,7 @@
-#modal-overlay {
+.judy-modal-overlay {
   background: #000;
-  filter: alpha(opacity=60);
   height: 100%;
   left: 0;
-  -moz-opacity: 0.6;
-  -webkit-opacity: 0.6;
-  -ms-filter: alpha(opacity=60);
   opacity: 0.6;
   position: absolute;
   top: 0;
@@ -13,7 +9,7 @@
   z-index: 998;
 }
 
-#modal-container {
+.judy-modal-container {
   background: #fff;
   border: 1px solid #ababab;
   box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.2);
@@ -25,7 +21,7 @@
   z-index: 998;
 }
 
-#modal-header {
+.judy-modal-header {
   height: 20px;
   overflow: hidden;
   clear: both;
@@ -34,19 +30,12 @@
 .judy-modal-close {
   cursor: pointer;
   display: block;
-  -moz-opacity: 0.6;
-  -webkit-opacity: 0.6;
-  -ms-filter: alpha(opacity=60);
   opacity: 0.6;
   float: right;
   height: 20px;
   width: 20px;
 }
-#modal-close:hover {
-  filter: alpha(opacity=100);
-  -moz-opacity: 1.0;
-  -webkit-opacity: 1.0;
-  -ms-filter: alpha(opacity=100);
+.judy-modal-close:hover {
   opacity: 1.0;
 }
 
