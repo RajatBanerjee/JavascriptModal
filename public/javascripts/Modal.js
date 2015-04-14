@@ -6,10 +6,12 @@
 		closeModalEvent,
 		defaultSettings = {
 			width: '250px',
-			height: '250px',
+			height:'auto',
 			closeOnOverlayClick: false,
-			content: "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Numquam nisi, temporibus quam iusto amet beatae ab nobis. Perferendis fugiat cupiditate quas iure alias odio suscipit voluptate facilis, dolorem sapiente adipisci.</p>",
-			closeButton: true,
+			innerContent: "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Numquam nisi, temporibus quam iusto amet beatae ab nobis. Perferendis fugiat cupiditate quas iure alias odio suscipit voluptate facilis, dolorem sapiente adipisci.</p>",
+			headerContent:"This is a header !!",
+			footerContent:"<button>	hahah</button>",
+			showClose: true,
 			afterOpen: false,
 			afterClose: false,
 			beforeClose: false,
@@ -21,7 +23,8 @@
 	var overlay,
 		container,
 		header,
-		content,
+		innerContent,
+		footer,
 		close;
 
 	/*
@@ -36,21 +39,22 @@
 		} else {
 			options.width = parameters.width || defaultSettings.width;
 			options.height = parameters.height || defaultSettings.height;
-			options.closeOnOverlayClick = parameters.closeOnOverlayClick || defaultSettings.closeOnOverlayClick;
-			options.closeButton = parameters.closeButton || defaultSettings.closeButton;
+			options.closeOnOverlayClick = typeof(parameters.closeOnOverlayClick)!="undefined"?parameters.closeOnOverlayClick: defaultSettings.closeOnOverlayClick;
+			options.showClose = typeof(parameters.showClose)!="undefined"?parameters.showClose: defaultSettings.showClose;
 			options.afterClose = parameters.afterClose || defaultSettings.afterClose;
 			options.beforeClose = parameters.beforeClose || defaultSettings.beforeClose;
 			options.afterOpen = parameters.afterOpen || defaultSettings.afterOpen;
-			options.overlay = parameters.overlay || defaultSettings.overlay;
-			options.content = parameters.content || defaultSettings.content;
-			options.closeOnEscape = parameters.closeOnEscape || defaultSettings.closeOnEscape;
+			options.overlay = typeof(parameters.overlay)!="undefined"?parameters.overlay:defaultSettings.overlay;
+			options.innerContent = parameters.innerContent || defaultSettings.innerContent;
+			options.footerContent = parameters.footerContent || defaultSettings.footerContent;
+			options.headerContent = parameters.headerContent || defaultSettings.headerContent;
+			options.closeOnEscape = typeof(parameters.closeOnEscape)!="undefined"?parameters.closeOnEscape:defaultSettings.closeOnEscape;
 		}
 
 		SetModalContainerOptions(options);
-		BuildModalInnerContent(options.content);
-		SetModalCenter();
+		SetModalContent(options);
 		setEventHandlers(options)
-
+		SetModalCenter();
 
 		if (options.afterOpen) {
 			options.afterOpen();
@@ -65,24 +69,21 @@
             options.beforeClose();
         }
 
-		modalContent.innerHTML = '';
-		modalOverlay.setAttribute('style', '');
-		modalOverlay.style.cssText = '';
-		modalOverlay.style.display = 'none';
-		modalContainer.setAttribute('style', '');
-		modalContainer.style.cssText = '';
-		modalContainer.style.display = 'none';
-		modalHeader.style.cursor = 'default';
-		modalClose.setAttribute('style', '');
-		modalClose.style.cssText = '';
+        //destroy header
+        header.innerHTML ='';
+        //destroy content
+        innerContent.innerHTML='';
+        //destroy footer
+        footer.innerHTML ='';
+		//hide overlay
+		overlay.style.display = 'none';
+		//hide container		
+		container.style.display = 'none';
 
 		if (options.closeCallback) {
 			options.closeCallback();
 		}
-
-
 		window.removeEventListener('resize', SetModalCenter(), false);
-
 	}
 
 
@@ -115,13 +116,21 @@
         close.setAttribute('id', 'modal-close');
         close.setAttribute('class', 'judy-modal-close');
         close.innerHTML = "X"
-        header.appendChild(close);
+        container.appendChild(close);
 
         //Build the modal contentHolder
-		content = document.createElement('div'),
-		content.setAttribute('id', 'judy-modal-content');
-        content.setAttribute('class', 'judy-modal-content');
-        container.appendChild(content);
+		innerContent = document.createElement('div'),
+		innerContent.setAttribute('id', 'judy-modal-content');
+        innerContent.setAttribute('class', 'judy-modal-content');
+        container.appendChild(innerContent);
+
+        //Build the footer
+        footer = document.createElement('div'),
+		footer.setAttribute('id', 'judy-modal-footer');
+        footer.setAttribute('class', 'judy-modal-footer');
+        container.appendChild(footer);
+
+
         htmlContent.appendChild(container);
         
         document.body.appendChild(htmlContent);
@@ -132,20 +141,27 @@
 		container.style.width = options.width;
 		container.style.height = options.height;
 
-		if (options.lock || !options.closeButton) {
+		if (options.showClose===true) {
 			close.style.display = 'block';
+		}else{
+			close.style.display = 'none';
 		}
 
-		if (!options.hideOverlay) {
+		if (options.overlay===true) {
 			overlay.style.display = 'block';
+		}else{
+			overlay.style.display = 'none';
 		}
 
 		container.style.display = 'block';
 	}
 
-	function BuildModalInnerContent(innerContent) {
+	function SetModalContent(parameters) {
 
-		content.innerHTML = innerContent;
+		innerContent.innerHTML = parameters.innerContent;
+		header.innerHTML=parameters.headerContent;
+		footer.innerHTML = parameters.footerContent
+
 	}
 
 	// Center the modal in the viewport
@@ -190,7 +206,7 @@
     function setEventHandlers(parameters) {
 
         close.addEventListener('click', function() {
-            if (parameters.closeButton) {
+            if (parameters.showClose) {
                 JudyModal.close();
             } else {
                 return false;
@@ -198,18 +214,19 @@
         });
 
         overlay.addEventListener('click', function() {
-            if (!parameters.lock) {
+            if (parameters.closeOnOverlayClick) {
                 JudyModal.close();
             } else {
                 return false;
             }
         });
 
-        document.onkeypress = function(e) {
-            if (e.keyCode === 27 && options.lock !== true) {
+        window.addEventListener('keydown',function(e) {
+            if (e.keyCode === 27 && options.closeOnEscape == true) {
                 JudyModal.close();
             }
-        };
+            
+        });
     }
 
     //load the modal basic content on the page
