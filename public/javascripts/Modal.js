@@ -27,9 +27,9 @@
 		footer,
 		close;
 
-	/*
-	PUBLIC FUNCTIONS
-	*/
+	//*********************************//
+	//PUBLIC FUNCTIONS
+	//*********************************//
 
 	// Open the modal
 	JudyModal.open = function(parameters) {
@@ -54,17 +54,16 @@
 		SetModalContainerOptions(options);
 		SetModalContent(options);
 		setEventHandlers(options)
-		SetModalCenter();
-
+		
+		//open callback
 		if (options.afterOpen) {
 			options.afterOpen();
 		}
 	}
 
-
 	// Close the modal
 	JudyModal.close = function() {
-
+		//before close callback
         if (options.beforeClose) {
             options.beforeClose();
         }
@@ -80,15 +79,17 @@
 		//hide container		
 		container.style.display = 'none';
 
+		//after clsoe callback
 		if (options.closeCallback) {
 			options.closeCallback();
 		}
-		window.removeEventListener('resize', SetModalCenter(), false);
 	}
 
+	//********************************//
+	// private functions
+	//********************************//
 
-
-	//private functions
+	//Build the modal sceleton on page load
 	function BuildModalContent() {
         var htmlContent = document.createDocumentFragment();
 
@@ -134,9 +135,9 @@
         htmlContent.appendChild(container);
         
         document.body.appendChild(htmlContent);
-		
 	}
 
+	//On modal open set the user specified attributes
 	function SetModalContainerOptions(options) {
 		container.style.width = options.width;
 		container.style.height = options.height;
@@ -156,55 +157,15 @@
 		container.style.display = 'block';
 	}
 
+	//Fill the modal with user specified content,header and footer
 	function SetModalContent(parameters) {
-
 		innerContent.innerHTML = parameters.innerContent;
 		header.innerHTML=parameters.headerContent;
 		footer.innerHTML = parameters.footerContent
-
 	}
 
-	// Center the modal in the viewport
-	function SetModalCenter() {
-		var documentHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight),
-
-			modalWidth = Math.max(container.clientWidth, container.offsetWidth),
-			modalHeight = Math.max(container.clientHeight, container.offsetHeight),
-
-			browserWidth = 0,
-			browserHeight = 0,
-
-			amountScrolledX = 0,
-			amountScrolledY = 0;
-
-		if (typeof(window.innerWidth) === 'number') {
-			browserWidth = window.innerWidth;
-			browserHeight = window.innerHeight;
-		} else if (document.documentElement && document.documentElement.clientWidth) {
-			browserWidth = document.documentElement.clientWidth;
-			browserHeight = document.documentElement.clientHeight;
-		}
-
-		if (typeof(window.pageYOffset) === 'number') {
-			amountScrolledY = window.pageYOffset;
-			amountScrolledX = window.pageXOffset;
-		} else if (document.body && document.body.scrollLeft) {
-			amountScrolledY = document.body.scrollTop;
-			amountScrolledX = document.body.scrollLeft;
-		} else if (document.documentElement && document.documentElement.scrollLeft) {
-			amountScrolledY = document.documentElement.scrollTop;
-			amountScrolledX = document.documentElement.scrollLeft;
-		}
-
-
-		container.style.left = amountScrolledX + (browserWidth / 2) - (modalWidth / 2) + 'px';
-
-		overlay.style.height = documentHeight + 'px';
-		overlay.style.width = '100%';
-	};
-
-    function setEventHandlers(parameters) {
-
+	//Register the event handlers for close, escape and overlay click
+	function setEventHandlers(parameters) {
         close.addEventListener('click', function() {
             if (parameters.showClose) {
                 JudyModal.close();
@@ -233,8 +194,5 @@
 	window.addEventListener('load', function() {
 		BuildModalContent();
 	}, false);
-
-    // on resize of the window set he modal to the center of the page          
-	window.addEventListener('resize', SetModalCenter, false);
 
 }());
